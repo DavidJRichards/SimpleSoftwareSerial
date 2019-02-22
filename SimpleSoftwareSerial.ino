@@ -25,10 +25,6 @@
  This example code is in the public domain.
 
  */
-//#include <SoftwareSerial.h>
-
-//SoftwareSerial mySerial(10, 11); // RX, TX
-
 void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(1200);
@@ -38,23 +34,13 @@ void setup() {
     ; // wait for serial port to connect. Needed for native USB port only
   }
 
-
-  Serial.println("Goodnight moon!");
-
-  // set the data rate for the SoftwareSerial port
-//  mySerial.begin(4800);
-//  mySerial.println("Hello, world?");
-  sssWrite("Hello, world?\n\r", 15);
 }
 
 void loop() { // run over and over
-//  if (mySerial.available()) {
-//    Serial.write(mySerial.read());
   if (sssAvailable()>0) {
     Serial.write(sssRead());
   }
   if (Serial.available()) {
-//    mySerial.write(Serial.read());
     sssWrite(Serial.read());
   }
 }

@@ -40,14 +40,10 @@
 //    variables - not accessible by user
 
 const int sssBaudRate = 75;
-const int t2mspercount = 64; //16; //8; //4; // 2; 
-const int t2prescaler  =  7; // 6; //5; //4; // 3; 
-//const int sssBaudRate = 1200;
-//const int t2mspercount = 4; //64; //16; //8; //4; // 2; 
-//const int t2prescaler  =  4; //7; // 6; //5; //4; // 3; 
+const int t2mspercount = 64;
+const int t2prescaler  =  7;
 const byte sssBufSize = 32;
-//const unsigned long sssIdleTimeoutMillis = 10; // at 9600 bps
-const unsigned long sssIdleTimeoutMillis = 1000000UL / sssBaudRate / 40 ; // calc to
+const unsigned long sssIdleTimeoutMillis = 1000000UL / sssBaudRate / 40 ; // calculated timeout
 
 const boolean sssdebugging = false; // controls printing of debug information
 
@@ -98,18 +94,15 @@ char sssBegin() {
                        // with fast PWM the clock resets when it matches
                        // and gives the wrong timing
                        
-//  TCCR2B = B00000011;  // set the prescaler to 32 - this gives counts at 2usec intervals
   TCCR2B = t2prescaler;  // set the prescaler to 1024 - this gives counts at 64usec intervals
   
   // set baud rate timing
-//  sssBaudTimerCount = 1000000UL / sssBaudRate / 2; // number of counts per baud at 2usecs per count
   sssBaudTimerCount = 1000000UL / sssBaudRate / t2mspercount; // number of counts per baud at n usecs per count
   sssBaudTimerFirstCount = sssBaudTimerCount; // I thought a longer period might be needed to get into
                                               // the first bit after the start bit - but apparently not
   // normally an interrupt occurs after sssBaudTimerCount * 2 usecs (104usecs for 9600 baud)
 
   // length of required idle period to synchronize start bit detection
-//  sssIdleIntervalMicros = 1000000UL / sssBaudRate * 25 ; // 2.5 byte lengths
   sssIdleIntervalMicros = 1000000UL / sssBaudRate * (25 * t2mspercount) / 2 ; // 2.5 byte lengths
   
   sssDbg("idleCount ", sssIdleIntervalMicros);
@@ -255,7 +248,6 @@ char sssPrepareToListen() {
   unsigned long sssIdleDelay = 1000000UL / sssBaudRate / 2; // usecs between checks - half the baud interval
   unsigned long sssStartMillis = millis();
   byte sssIdleCount = 0;
-//  byte sssMinIdleCount = 44; // 20 bits checked at half the bit interval plus a little extra
   byte sssMinIdleCount = 40; // 20 bits checked at half the bit interval plus a little extra
   
   sssDbg("idleDelay ", sssIdleDelay);
